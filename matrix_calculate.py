@@ -192,7 +192,7 @@ if __name__ == "__main__":
             btn_dim.grid(row=2, column=1)
             frm_dim.grid(row=1, column=1)
             mat_input = []
-            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output    (operator))
+            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output    ())
             def create_inp_mat(row, column):
                 nonlocal mat_input
                 left, right = tk.Frame(master=window), tk.Frame(master=window)
@@ -211,19 +211,22 @@ if __name__ == "__main__":
                 right.grid(row=3, column=2)
                 submit_mat.grid(row=4, column=1)
 
-            def show_output(operator):
+            def show_output():
                 nonlocal mat_input
                 A, B = [], []
-                for r in mat_input[0]:
-                    row = []
-                    for c in r:
-                        row.append(int(c.get().strip()))
-                    A.append(row)
-                for r in mat_input[1]:
-                    row = []
-                    for c in r:
-                        row.append(int(c.get().strip()))
-                    B.append(row)
+                try:
+                    for r in mat_input[0]:
+                        row = []
+                        for c in r:
+                            row.append(int(c.get().strip()))
+                        A.append(row)
+                    for r in mat_input[1]:
+                        row = []
+                        for c in r:
+                            row.append(int(c.get().strip()))
+                        B.append(row)
+                except TypeError:
+                    mes.showerror("Error", "Something is going in the wrong way\nPlease check the input.")
                 A, B = Matrix(A), Matrix(B)
                 result = A + B if operator == "+" else A - B
                 result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
@@ -281,20 +284,64 @@ if __name__ == "__main__":
             def show_output():
                 nonlocal mat_input
                 A, B = [], []
-                for r in mat_input[0]:
-                    row = []
-                    for c in r:
-                        row.append(int(c.get().strip()))
-                    A.append(row)
-                for r in mat_input[1]:
-                    row = []
-                    for c in r:
-                        row.append(int(c.get().strip()))
-                    B.append(row)
+                try:
+                    for r in mat_input[0]:
+                        row = []
+                        for c in r:
+                            row.append(int(c.get().strip()))
+                        A.append(row)
+                    for r in mat_input[1]:
+                        row = []
+                        for c in r:
+                            row.append(int(c.get().strip()))
+                        B.append(row)
+                except TypeError:
+                    mes.showerror("Error", "Something is going in the wrong way\nPlease check the input.")
                 A, B = Matrix(A), Matrix(B)
                 result = A * B
                 result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
                 result.grid(row=5, column=1)
+
+        elif operator == "det" or operator == "inverse" or operator == "adjoint":
+            frm_dim = tk.Frame(master=window)
+            n = tk.Entry(frm_dim, width=3)
+            tk.Label(frm_dim, text="dimension of the matrix:").grid(row=0, column=0)
+            n.grid(row=1, column=0)
+            btn_dim = tk.Button(master=frm_dim, text="Okay",
+            command=lambda: create_inp_mat(int(n.get())))
+            btn_dim.grid(row=2, column=0)
+            frm_dim.grid(row=1, column=1)
+            mat_input = []
+            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output ())
+            def create_inp_mat(n):
+                nonlocal mat_input
+                inp_mat_frm= tk.Frame(master=window)
+                for r in range(n):
+                    each_row = []
+                    for c in range(n):
+                        ent = tk.Entry(master=inp_mat_frm, width=3)
+                        ent.grid(row=r, column=c, padx=6, pady=6)
+                        each_row.append(ent)
+                    mat_input.append(each_row)
+                inp_mat_frm.grid(row=3, column=1)
+                submit_mat.grid(row=4, column=1)
+            def show_output():
+                nonlocal mat_input
+                A = []
+                try:
+                    for r in mat_input:
+                        row = []
+                        for c in r:
+                            row.append(float(c.get()))
+                        A.append(row)
+                except ValueError:
+                    mes.showerror("Error", "Something is going in the wrong way\nPlease check the input.")
+                    return
+                A = Matrix(A)
+                result = A.determinant() if operator == "det" else A.inverse() if operator == "inverse" else A.adjoint()
+                result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
+                result.grid(row=5, column=1)
+
 
         window.mainloop()
     
