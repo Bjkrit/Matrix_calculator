@@ -1,5 +1,6 @@
 import sys
 import tkinter as tk
+from tkinter import messagebox as mes
 
 sys.setrecursionlimit(3000)
 
@@ -170,76 +171,158 @@ if __name__ == "__main__":
     root.title("Matrix calculator")
     root.iconbitmap("calculator.ico")
     root.geometry("400x200+300+200")
+
+    def new_window(operator):
+        window = tk.Toplevel(root)
+        window.title(operator)
+        window.geometry("300x400")
+        window.minsize(300, 400)
+        window.maxsize(400, 490)
+        tk.Label(master=window, text="type your input below", font=("Arial", 20), fg="blue").grid(row=0,column=0,   columnspan=3)
+        if operator == "+" or operator == "-":
+            frm_dim = tk.Frame(master=window)
+            nrow, ncolumn  = tk.Entry(frm_dim, width=3), tk.Entry(frm_dim, width=3)
+            tk.Label(frm_dim, text="dimension of the matrix:").grid(row=0, column=0, columnspan=3)
+            nrow.grid(row=1, column=0)
+            tk.Label(frm_dim, text="x", font=("", 10)).grid(row=1, column=1)
+            ncolumn.grid(row=1, column=2)
+            dimension = (nrow, ncolumn)
+            btn_dim = tk.Button(master=frm_dim, text="Okay",
+            command=lambda: create_inp_mat(int(dimension[0].get()), int(dimension[1].get())))
+            btn_dim.grid(row=2, column=1)
+            frm_dim.grid(row=1, column=1)
+            mat_input = []
+            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output    (operator))
+            def create_inp_mat(row, column):
+                nonlocal mat_input
+                left, right = tk.Frame(master=window), tk.Frame(master=window)
+                for master in (left, right):
+                    mat = []
+                    for r in range(row):
+                        each_row = []
+                        for c in range(column):
+                            ent = tk.Entry(master=master, width=3)
+                            ent.grid(row=r, column=c, padx=6, pady=6)
+                            each_row.append(ent)
+                        mat.append(each_row)
+                    mat_input.append(mat)
+                left.grid(row=3, column=0)
+                tk.Label(master=window, text=operator, font=("", 30)).grid(row=3, column=1)
+                right.grid(row=3, column=2)
+                submit_mat.grid(row=4, column=1)
+
+            def show_output(operator):
+                nonlocal mat_input
+                A, B = [], []
+                for r in mat_input[0]:
+                    row = []
+                    for c in r:
+                        row.append(int(c.get().strip()))
+                    A.append(row)
+                for r in mat_input[1]:
+                    row = []
+                    for c in r:
+                        row.append(int(c.get().strip()))
+                    B.append(row)
+                A, B = Matrix(A), Matrix(B)
+                result = A + B if operator == "+" else A - B
+                result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
+                result.grid(row=5, column=1)
+        elif operator == "x":
+            window.maxsize(500, 550)
+            frm_dim_1, frm_dim_2 = tk.Frame(window), tk.Frame(window)
+            nrow1, ncolumn1  = tk.Entry(frm_dim_1, width=3), tk.Entry(frm_dim_1, width=3)
+            tk.Label(frm_dim_1, text="dimension of the matrix:").grid(row=0, column=0, columnspan=3)
+            nrow1.grid(row=1, column=0)
+            tk.Label(frm_dim_1, text="x", font=("", 10)).grid(row=1, column=1)
+            ncolumn1.grid(row=1, column=2)
+            nrow2, ncolumn2  = tk.Entry(frm_dim_2, width=3), tk.Entry(frm_dim_2, width=3)
+            tk.Label(frm_dim_2, text="dimension of the matrix:").grid(row=0, column=0, columnspan=3)
+            nrow2.grid(row=1, column=0)
+            tk.Label(frm_dim_2, text="x", font=("", 10)).grid(row=1, column=1)
+            ncolumn2.grid(row=1, column=2)
+            frm_dim_1.grid(row=1, column=0, padx=5)
+            frm_dim_2.grid(row=1, column=2, padx=5)
+            btn_dim = tk.Button(master=window, text="Okay",
+            command=lambda: create_inp_mat(int(nrow1.get().strip()), int(ncolumn1.get().strip()), 
+            int(nrow2.get().strip()), int(ncolumn2.get().strip())))
+            btn_dim.grid(row=2, column=1)
+            mat_input = []
+            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output    ())
+
+            def create_inp_mat(nrow1, ncolumn1, nrow2, ncolumn2):
+                if ncolumn1 != nrow2:
+                    mes.showerror("Error", "These dimension of matrix can not be calculated")
+                    return
+                nonlocal mat_input
+                left, right = tk.Frame(master=window), tk.Frame(master=window)
+                mat1 = []
+                for r in range(nrow1):
+                    row=[]
+                    for c in range(ncolumn1):
+                        ent = tk.Entry(master=left, width=3)
+                        ent.grid(row=r, column=c, padx=6, pady=6)
+                        row.append(ent)
+                    mat1.append(row)
+                mat2 = []
+                for r in range(nrow2):
+                    row=[]
+                    for c in range(ncolumn2):
+                        ent = tk.Entry(master=right, width=3)
+                        ent.grid(row=r, column=c, padx=6, pady=6)
+                        row.append(ent)
+                    mat2.append(row)
+                mat_input.append(mat1)
+                mat_input.append(mat2)
+                left.grid(row=3, column=0)
+                tk.Label(master=window, text="x", font=("", 30)).grid(row=3, column=1)
+                right.grid(row=3, column=2)
+                submit_mat.grid(row=4, column=1)
+            def show_output():
+                nonlocal mat_input
+                A, B = [], []
+                for r in mat_input[0]:
+                    row = []
+                    for c in r:
+                        row.append(int(c.get().strip()))
+                    A.append(row)
+                for r in mat_input[1]:
+                    row = []
+                    for c in r:
+                        row.append(int(c.get().strip()))
+                    B.append(row)
+                A, B = Matrix(A), Matrix(B)
+                result = A * B
+                result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
+                result.grid(row=5, column=1)
+
+        window.mainloop()
+    
+    # def multiply():
+    #     pass
+    # def det():
+    #     pass
+    # def inverse():
+    #     pass
+    # def minor():
+    #     pass
+    # def cofactor():
+    #     pass
+    # def adjoint():
+    #     pass
     
     tk.Label(master=root, text="Select the option" , font=("", 20)).grid(row=0, column=0, pady=20)
     menu = tk.Frame(master=root)
-    tk.Button(master=menu, width=8, text="add", cursor="trek", font=("", 12), command=lambda:add_or_minus("+")).grid(row=0, column=0)
-    tk.Button(master=menu, width=8, text="subtract", cursor="trek", font=("", 12), command=lambda:add_or_minus("-")).grid(row=0, column=1)
-    tk.Button(master=menu, width=8, text="multiply", cursor="trek", font=("", 12), command=lambda:new_window("multiply")).grid(row=0,column=2)
-    tk.Button(master=menu, width=8, text="det", cursor="trek", font=("", 12), command=lambda:new_window("det")).grid(row=0, column=3)
-    tk.Button(master=menu, width=8, text="inverse", cursor="trek", font=("", 12), command=lambda:new_window("inverse")).grid(row=1, column=0)
-    tk.Button(master=menu, width=8, text="minor", cursor="trek", font=("", 12), command=lambda:new_window("minor")).grid(row=1, column=1)
-    tk.Button(master=menu, width=8, text="cofactor", cursor="trek", font=("", 12), command=lambda:new_window("cofactor")).grid(row=1, column=2)
-    tk.Button(master=menu, width=8, text="adjoint", cursor="trek", font=("", 12), command=lambda:new_window("adjoint")).grid(row=1, column=3)
+    tk.Button(master=menu, width=8, text="add", cursor="trek", font=("", 12), command=lambda:new_window("+")).grid(row=0, column=0)
+    tk.Button(master=menu, width=8, text="subtract", cursor="trek", font=("", 12), command=lambda:new_window("-")).grid(row=0, column=1)
+    tk.Button(master=menu, width=8, text="multiply", cursor="trek", font=("", 12), command=lambda: new_window("x")).grid(row=0,column=2)
+    tk.Button(master=menu, width=8, text="det", cursor="trek", font=("", 12), command=lambda: new_window("det")).grid(row=0, column=3)
+    tk.Button(master=menu, width=8, text="inverse", cursor="trek", font=("", 12), command=lambda: new_window("inverse")).grid(row=1, column=0)
+    tk.Button(master=menu, width=8, text="minor", cursor="trek", font=("", 12), command=lambda: new_window("minor")).grid(row=1, column=1)
+    tk.Button(master=menu, width=8, text="cofactor", cursor="trek", font=("", 12), command=lambda: new_window("cofactor")).grid(row=1, column=2)
+    tk.Button(master=menu, width=8, text="adjoint", cursor="trek", font=("", 12), command=lambda: new_window("adjoint")).grid(row=1, column=3)
     menu.grid(row=1, column=0)
     root.columnconfigure(0, weight=1, minsize=100)
     root.minsize(330, 140)
     root.maxsize(500, 250)
-
-    def add_or_minus(operator:str):
-        window = tk.Toplevel(root)
-        window.title("add" if operator == "+" else "subtract")
-        window.geometry("300x400")
-        window.minsize(300, 400)
-        window.maxsize(400, 490)
-        tk.Label(master=window, text="type your input below", font=("Arial", 20), fg="blue").grid(row=0, column=0, columnspan=3)
-        frm_dim = tk.Frame(master=window)
-        nrow, ncolumn  = tk.Entry(frm_dim, width=3), tk.Entry(frm_dim, width=3)
-        nrow.grid(row=0, column=0)
-        tk.Label(frm_dim, text="x", font=("", 10)).grid(row=0, column=1)
-        ncolumn.grid(row=0, column=2)
-        dimension = (nrow, ncolumn)
-        frm_dim.grid(row=1, column=1)
-        btn_dim = tk.Button(master=window, text="Okay",
-        command=lambda: create_inp_mat(int(dimension[0].get()), int(dimension[1].get())))
-        btn_dim.grid(row=2, column=1)
-        mat_input = []
-        submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output(operator))
-        def create_inp_mat(row, column):
-            nonlocal mat_input
-            left, right = tk.Frame(master=window), tk.Frame(master=window)
-            for master in (left, right):
-                mat = []
-                for r in range(row):
-                    each_row = []
-                    for c in range(column):
-                        ent = tk.Entry(master=master, width=3)
-                        ent.grid(row=r, column=c, padx=6, pady=6)
-                        each_row.append(ent)
-                    mat.append(each_row)
-                mat_input.append(mat)
-            left.grid(row=3, column=0)
-            tk.Label(master=window, text=operator, font=("", 30)).grid(row=3, column=1)
-            right.grid(row=3, column=2)
-            submit_mat.grid(row=4, column=1)
-        
-        def show_output(operator):
-            nonlocal mat_input
-            A, B = [], []
-            for r in mat_input[0]:
-                row = []
-                for c in r:
-                    row.append(int(c.get()))
-                A.append(row)
-            for r in mat_input[1]:
-                row = []
-                for c in r:
-                    row.append(int(c.get()))
-                B.append(row)
-            A, B = Matrix(A), Matrix(B)
-            result = A + B if operator == "+" else A - B
-            result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
-            result.grid(row=5, column=1)
-        window.mainloop()
-
     root.mainloop()
