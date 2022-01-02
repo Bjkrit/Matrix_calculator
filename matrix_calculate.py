@@ -341,23 +341,62 @@ if __name__ == "__main__":
                 result = A.determinant() if operator == "det" else A.inverse() if operator == "inverse" else A.adjoint()
                 result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
                 result.grid(row=5, column=1)
+        else:
+            frm_dim = tk.Frame(master=window)
+            n = tk.Entry(frm_dim, width=3)
+            tk.Label(frm_dim, text="dimension of the matrix:").grid(row=0, column=0)
+            n.grid(row=1, column=0)
+            btn_dim = tk.Button(master=frm_dim, text="Okay",
+            command=lambda: create_inp_mat(int(n.get())))
+            btn_dim.grid(row=2, column=0)
+            frm_dim.grid(row=1, column=1)
+            mat_input = []
+            row:tk.Entry
+            column:tk.Entry
+            submit_mat = tk.Button(master=window, text="Okay", width=5, height=1, command=lambda:show_output ())
+            def create_inp_mat(n):
+                nonlocal mat_input, row, column
+                inp_mat_frm = tk.Frame(master=window)
+                for r in range(n):
+                    each_row = []
+                    for c in range(n):
+                        ent = tk.Entry(master=inp_mat_frm, width=3)
+                        ent.grid(row=r, column=c, padx=6, pady=6)
+                        each_row.append(ent)
+                    mat_input.append(each_row)
+                inp_mat_frm.grid(row=3, column=0)
+                posi_frm = tk.Frame(master=window)
+                tk.Label(posi_frm, text="Position", font=("", 12)).grid(row=0, column=0, columnspan=2)
+                row = tk.Entry(posi_frm, width=3)
+                column = tk.Entry(posi_frm, width=3)
+                tk.Label(posi_frm, text="I=", font=("", 10)).grid(row=1, column=0)
+                row.grid(row=1, column=1)
+                tk.Label(posi_frm, text="J=", font=("", 10)).grid(row=2, column=0)
+                column.grid(row=2, column=1)
+                posi_frm.grid(row=3, column=2)
+                submit_mat.grid(row=4, column=1)
+            def show_output():
+                nonlocal mat_input, row, column
+                A = []
+                try:
+                    for r in mat_input:
+                        each_row = []
+                        for c in r:
+                            each_row.append(float(c.get()))
+                        A.append(each_row)
+                    row, column = int(row.get()), int(column.get())
+                except ValueError:
+                    mes.showerror("Error", "Something is going in the wrong way\nPlease check the input.")
+                    return
+                A = Matrix(A)
+                result = int(A.minor((row, column)) if operator == "minor" else A.cofactor((row, column)))
+                result = tk.Label(master=window, text=str(result), font=("Consolas", 20))
+                result.grid(row=5, column=1)
+
 
 
         window.mainloop()
-    
-    # def multiply():
-    #     pass
-    # def det():
-    #     pass
-    # def inverse():
-    #     pass
-    # def minor():
-    #     pass
-    # def cofactor():
-    #     pass
-    # def adjoint():
-    #     pass
-    
+
     tk.Label(master=root, text="Select the option" , font=("", 20)).grid(row=0, column=0, pady=20)
     menu = tk.Frame(master=root)
     tk.Button(master=menu, width=8, text="add", cursor="trek", font=("", 12), command=lambda:new_window("+")).grid(row=0, column=0)
